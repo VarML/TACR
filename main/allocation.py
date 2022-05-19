@@ -30,7 +30,7 @@ def experiment(exp_prefix, variant):
     group_name = f'{exp_prefix}-{env_name}'
     exp_prefix = f'{group_name}-{random.randint(int(1e5), int(1e6) - 1)}'
 
-    train = pd.read_csv("data/s&p/sp_train.csv", index_col=[0])
+    train = pd.read_csv("data/s&p/train.csv", index_col=[0])
     max_ep_len = train.index[-1]
 
     stock_dimension = len(train.tic.unique())
