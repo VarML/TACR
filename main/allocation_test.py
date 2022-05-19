@@ -23,14 +23,11 @@ def experiment(exp_prefix, variant,):
     print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
 
     env_kwargs = {
-        "hmax": 100,
         "initial_amount": 1000000,
-        "transaction_cost_pct": 0.0025,
         "state_space": state_space,
         "stock_dim": stock_dimension,
         "tech_indicator_list": config.TECHNICAL_INDICATORS_LIST,
         "action_space": stock_dimension,
-        "reward_scaling": 1e-4,
         "mode":"test"
     }
     env = StockPortfolioEnv(df=trade, **env_kwargs)
