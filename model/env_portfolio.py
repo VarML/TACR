@@ -18,12 +18,8 @@ class StockPortfolioEnv(gym.Env):
             input data
         stock_dim : int
             number of unique stocks
-        hmax : int
-            maximum number of shares to trade
         initial_amount : int
             start money
-        transaction_cost_pct: float
-            transaction cost percentage per trade
         reward_scaling: float
             scaling factor for reward, good for training
         state_space: int
@@ -61,9 +57,7 @@ class StockPortfolioEnv(gym.Env):
         self,
         df,
         stock_dim,
-        hmax,
         initial_amount,
-        transaction_cost_pct,
         reward_scaling,
         state_space,
         action_space,
@@ -80,9 +74,7 @@ class StockPortfolioEnv(gym.Env):
         self.lookback = lookback
         self.df = df
         self.stock_dim = stock_dim
-        self.hmax = hmax
         self.initial_amount = initial_amount
-        self.transaction_cost_pct = transaction_cost_pct
         self.reward_scaling = reward_scaling
         self.mode=mode
         self.state_space = state_space
