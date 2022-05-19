@@ -2,6 +2,7 @@
 
 <br/> <br/> 
 
+Transfor Actor-Crtic is an ensemble model that combines transformer and reinforcement learning to train automated stock trading algorithm.
 We provide environment, datasets, and model using pytorch. 
 
 <br/> <br/> 
