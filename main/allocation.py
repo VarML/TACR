@@ -30,7 +30,7 @@ def experiment(exp_prefix, variant):
     group_name = f'{exp_prefix}-{env_name}'
     exp_prefix = f'{group_name}-{random.randint(int(1e5), int(1e6) - 1)}'
 
-    train = pd.read_csv("sp/sp_train.csv", index_col=[0])
+    train = pd.read_csv("data/s&p/sp_train.csv", index_col=[0])
     max_ep_len = train.index[-1]
 
     stock_dimension = len(train.tic.unique())
@@ -72,7 +72,7 @@ def experiment(exp_prefix, variant):
 
     trajectories=[]
     for i in range(5):
-        dataset_path = f'sp/{"stock"+str(i+1)}-{"train"}-v2.pkl'
+        dataset_path = f'data/s&p/{"stock"+str(i+1)}-{"train"}-v2.pkl'
         with open(dataset_path, 'rb') as f:
             tra = pickle.load(f)
         trajectories.append(tra[0])
