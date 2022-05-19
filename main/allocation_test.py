@@ -4,17 +4,17 @@ import argparse
 import pandas as pd
 import numpy as np
 import pickle
-from finrl.apps import config
-from finrl.neo_finrl.env_portfolio_allocation.env_portfolio2 import StockPortfolioEnv
+from model import config
+from model.env_portfolio import StockPortfolioEnv
 from decision_transformer.evaluation.evaluate_episodes import evaluate_episode, evaluate_episode_rtg,evaluate,eval_test
-from decision_transformer.models.decision_transformer import DecisionTransformer
+from decision_transformer.models.tac import tac
 
 
 def experiment(exp_prefix, variant,):
     device = variant.get('device', 'cuda')
 
-    train = pd.read_csv("sp/sp_train.csv", index_col=[0])
-    trade = pd.read_csv("sp/sp_trade.csv", index_col=[0])
+    train = pd.read_csv("data/s&p/train.csv", index_col=[0])
+    trade = pd.read_csv("data/s&p/trade.csv", index_col=[0])
     max_ep_len = train.index[-1]
 
     stock_dimension = len(trade.tic.unique())
@@ -40,7 +40,7 @@ def experiment(exp_prefix, variant,):
 
     trajectories = []
     for i in range(5):
-        dataset_path = f'sp/{"stock" + str(i + 1)}-{"train"}-v2.pkl'
+        dataset_path = f'data/s&p/{"stock" + str(i + 1)}-{"train"}-v2.pkl'
         with open(dataset_path, 'rb') as f:
             tra = pickle.load(f)
         trajectories.append(tra[0])
@@ -57,12 +57,12 @@ def experiment(exp_prefix, variant,):
     states = np.concatenate(states, axis=0)
     state_mean, state_std = np.mean(states, axis=0), np.std(states, axis=0) + 1e-6
 
-    K = variant['K']
+    u = variant['u']
 
     model = DecisionTransformer(
         state_dim=state_dim,
         act_dim=act_dim,
-        max_length=K,
+        max_length=u,
         max_ep_len=max_ep_len,
         hidden_size=variant['embed_dim'],
         n_layer=variant['n_layer'],
@@ -88,7 +88,7 @@ def experiment(exp_prefix, variant,):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--K', type=int, default=40)
+    parser.add_argument('--u', type=int, default=40)
     parser.add_argument('--pct_traj', type=float, default=1.)
     parser.add_argument('--embed_dim', type=int, default=128)
     parser.add_argument('--n_layer', type=int, default=3)
