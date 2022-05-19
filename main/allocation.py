@@ -6,8 +6,8 @@ import argparse
 import random
 import pickle
 import pandas as pd
-from finrl.apps import config
-from fmodel.env_portfolio2 import StockPortfolioEnv
+from model import config
+from model.env_portfolio import StockPortfolioEnv
 import torch
 from model.evaluation.evaluate_episodes import evaluate_episode, evaluate_episode_rtg,evaluate
 from model.models.tac import tac
@@ -39,14 +39,11 @@ def experiment(exp_prefix, variant):
     print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
 
     env_kwargs = {
-        "hmax": 100,
         "initial_amount": 1000000,
-        "transaction_cost_pct": 0.0025,
         "state_space": state_space,
         "stock_dim": stock_dimension,
         "tech_indicator_list": config.TECHNICAL_INDICATORS_LIST,
         "action_space": stock_dimension,
-        "reward_scaling": 1e-4
     }
     env = StockPortfolioEnv(df=train, **env_kwargs)
 
