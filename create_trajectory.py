@@ -53,6 +53,6 @@ for i in range(5):
     for k in traj:
         episode_data[k] = np.array(traj[k])
     paths.append(episode_data)
-    name = f'{"trajectory/stock"+str(i+1)}-{"train"}-v2'
+    name = f'{"trajectory/stock"+str(i+1)}-{"train"}'
     with open(f'{name}.pkl', 'wb') as f:
         pickle.dump(paths, f)
