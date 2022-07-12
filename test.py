@@ -37,7 +37,7 @@ def experiment(variant):
 
     trajectories = []
     for i in range(5):
-        dataset_path = f'trajectory/{"stock" + str(i + 1)}-{"train"}-v2.pkl'
+        dataset_path = f'trajectory/{"stock" + str(i + 1)}-{"train"}.pkl'
         with open(dataset_path, 'rb') as f:
             tra = pickle.load(f)
         trajectories.append(tra[0])
