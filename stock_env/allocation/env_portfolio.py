@@ -5,8 +5,7 @@ import numpy as np
 import pandas as pd
 from gym import spaces
 from gym.utils import seeding
-import math
-import random
+import os
 matplotlib.use("Agg")
 
 
@@ -146,6 +145,8 @@ class StockPortfolioEnv(gym.Env):
                 #         self.mode
                 #     )
                 # )
+                if not os.path.exists("results"):
+                    os.makedirs("results")
 
                 df_asset = self.save_asset_memory()
                 df_asset.to_csv(

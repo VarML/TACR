@@ -7,6 +7,7 @@ import argparse
 from preprocessor.process_traj import trajectory
 import numpy as np
 import pickle
+import os
 
 def create_data(variant):
     #Create datasets
@@ -74,6 +75,9 @@ def create_data(variant):
         train = data_split(processed_full, '2009-01-01','2020-09-01')
         trade = data_split(processed_full, '2020-09-01','2021-12-31')
 
+    if not os.path.exists("datasets"):
+        os.makedirs("datasets")
+
     train.to_csv("datasets/"+variant['dataset']+"_train.csv")
     trade.to_csv("datasets/"+variant['dataset']+"_trade.csv")
 
@@ -125,6 +129,9 @@ def create_data(variant):
     for i in range(5):
         traj = traj_generator(env, i)
         paths.append(traj)
+
+    if not os.path.exists("trajectory"):
+        os.makedirs("trajectory")
 
     name = f'{"trajectory/"+variant["dataset"]+"_traj"}'
     with open(f'{name}.pkl', 'wb') as f:
