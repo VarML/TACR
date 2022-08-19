@@ -14,5 +14,5 @@ We provide package version (conda_stock.yaml), environment, datasets, and model 
 
 create_data.py > train.py > test.py
 
-#License
+# License
 MIT
