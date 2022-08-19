@@ -54,11 +54,13 @@ class StockPortfolioEnv(gym.Env):
         state_space,
         action_space,
         tech_indicator_list,
+        dataset=None,
         turbulence_threshold=None,
         mode="",
         lookback=252,
         day=0,
     ):
+        self.dataset=dataset
         self.day = day
         self.lookback = lookback
         self.df = df
@@ -115,11 +117,11 @@ class StockPortfolioEnv(gym.Env):
             df = pd.DataFrame(self.portfolio_return_memory)
             df.columns = ["daily_return"]
             plt.plot(df.daily_return.cumsum(), "r")
-            plt.savefig("results/cumulative_reward.png")
+            plt.savefig("results/"+self.dataset+"_cumulative_reward.png")
             plt.close()
 
             plt.plot(self.portfolio_return_memory, "r")
-            plt.savefig("results/rewards.png")
+            plt.savefig("results/"+self.dataset+"_rewards.png")
             plt.close()
 
             print("=================================")
@@ -152,14 +154,16 @@ class StockPortfolioEnv(gym.Env):
 
                 df_asset = self.save_asset_memory()
                 df_asset.to_csv(
-                    "results/asset_{}.csv".format(
+                    "results/{}_asset_{}.csv".format(
+                        self.dataset,
                         self.mode
                     )
                 )
                 
                 plt.plot(df_asset, "r")
                 plt.savefig(
-                    "results/account_value_{}.png".format(
+                    "results/{}_account_value_{}.png".format(
+                        self.dataset,
                         self.mode
                     ),
                     index=False,

@@ -9,6 +9,8 @@ from stock_env.allocation.env_portfolio import StockPortfolioEnv
 from tac.evaluation.evaluate_episodes import eval_test
 from tac.models.transformer_actor import TransformerActor
 import torch.backends.cudnn as cudnn
+import os
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 def experiment(variant):
     device = variant.get('device', 'cuda')
@@ -44,7 +46,7 @@ def experiment(variant):
             "mode": "test"
         }
 
-    env = StockPortfolioEnv(df=trade, **env_kwargs)
+    env = StockPortfolioEnv(df=trade, dataset=dataset, **env_kwargs)
 
     seed = variant['seed']
     env.seed(seed)
