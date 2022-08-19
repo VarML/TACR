@@ -109,6 +109,9 @@ class StockPortfolioEnv(gym.Env):
         # print(actions)
 
         if self.terminal:
+            if not os.path.exists("results"):
+                os.makedirs("results")
+
             df = pd.DataFrame(self.portfolio_return_memory)
             df.columns = ["daily_return"]
             plt.plot(df.daily_return.cumsum(), "r")
@@ -145,8 +148,7 @@ class StockPortfolioEnv(gym.Env):
                 #         self.mode
                 #     )
                 # )
-                if not os.path.exists("results"):
-                    os.makedirs("results")
+
 
                 df_asset = self.save_asset_memory()
                 df_asset.to_csv(
