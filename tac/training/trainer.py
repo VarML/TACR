@@ -2,7 +2,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.optim as optim
 import copy
 import time
 
@@ -24,18 +23,10 @@ class Critic(nn.Module):
         q = self.l3(q)
         
         return q
-
-    def Q1(self, state, action):
-        sa = torch.cat([state, action], 1)
-
-        q= F.relu(self.l1(sa))
-        q = F.relu(self.l2(q))
-        q = self.l3(q)
-        return q
     
 class Trainer:
 
-    def __init__(self, model, optimizer, batch_size, get_batch, state_dim, action_dim, K, loss_fn=None,scheduler=None, eval_fns=None):
+    def __init__(self, model, optimizer, batch_size, get_batch, state_dim, action_dim, state_mean,state_std, alpha, loss_fn=None,scheduler=None, eval_fns=None):
 
         self.optimizer = optimizer
         self.batch_size = batch_size
@@ -46,7 +37,8 @@ class Trainer:
         self.diagnostics = dict()
         self.state_dim = state_dim
         self.action_dim = action_dim
-        self.K = K
+        self.state_mean=state_mean
+        self.state_std = state_std
         self.total_it = 0
 
         # Algorithm 1, line1, line2 : Initialize actor and critic weights
@@ -59,8 +51,8 @@ class Trainer:
         self.discount = 0.99
         self.tau = 0.005
 
-        # Algorithm 1, line12 : Set hyperparameter alpha 0.1 ~ 4.5
-        self.alpha = 3.8
+        # Algorithm 1, line12 : Set hyperparameter alpha 0.3 ~ 3
+        self.alpha = alpha
 
         self.start_time = time.time()
 
@@ -78,16 +70,7 @@ class Trainer:
             train_losses.append(train_loss)
 
         logs['time/training'] = time.time() - train_start
-
-        # eval_start = time.time()
-        # self.actor.eval()
-        # for eval_fn in self.eval_fns:
-        #     outputs = eval_fn(self.actor)
-        #     for k, v in outputs.items():
-        #         logs[f'evaluation/{k}'] = v
-
         logs['time/total'] = time.time() - self.start_time
-        #logs['time/evaluation'] = time.time() - eval_start
         logs['training/train_loss_mean'] = np.mean(train_losses)
         logs['training/train_loss_std'] = np.std(train_losses)
 

@@ -161,14 +161,14 @@ class StockPortfolioEnv(gym.Env):
                 )
                 
                 plt.plot(df_asset, "r")
-                plt.savefig(
-                    "results/{}_account_value_{}.png".format(
-                        self.dataset,
-                        self.mode
-                    ),
-                    index=False,
-                )
-                plt.close()
+                # plt.savefig(
+                #     "results/{}_account_value_{}.png".format(
+                #         self.dataset,
+                #         self.mode
+                #     ),
+                #     index=False,
+                # )
+                # plt.close()
 
             return self.state, self.reward, self.terminal, {}
 

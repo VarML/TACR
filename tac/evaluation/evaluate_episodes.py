@@ -8,11 +8,9 @@ def eval_test(
         act_dim,
         model,
         max_ep_len=1000,
-        scale=1000.,
         state_mean=0.,
         state_std=1.,
         device='cuda',
-        target_return=None,
     ):
 
     model.eval()

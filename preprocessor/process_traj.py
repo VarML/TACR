@@ -1,49 +1,49 @@
 import numpy as np
 
+
 class trajectory:
 
     def __init__(
-        self,
-        dataset,
-        df,
-        stock_dim,
-        state_space,
-        action_space,
-        tech_indicator_list,
-        day=0,
+            self,
+            dataset,
+            df,
+            stock_dim,
+            state_space,
+            action_space,
+            tech_indicator_list,
+            day=0,
     ):
 
-        self.dataset=dataset
+        self.dataset = dataset
         self.day = day
         self.df = df
         self.stock_dim = stock_dim
         self.state_space = state_space
         self.action_space = action_space
         self.tech_indicator_list = tech_indicator_list
-        
+
         self.data = self.df.loc[self.day, :]
         self.state = (
-                    self.data.open.values.tolist()
-                    + self.data.high.values.tolist()
-                    + self.data.low.values.tolist()
-                    + self.data.close.values.tolist()
-                    + sum(
-                        [
-                            self.data[tech].values.tolist()
-                            for tech in self.tech_indicator_list
-                        ],
-                        [],
-                    )
-                )
+                self.data.open.values.tolist()
+                + self.data.high.values.tolist()
+                + self.data.low.values.tolist()
+                + self.data.close.values.tolist()
+                + sum(
+            [
+                self.data[tech].values.tolist()
+                for tech in self.tech_indicator_list
+            ],
+            [],
+        )
+        )
         self.terminal = False
 
-    def step(self,i):
+    def step(self, i):
         # print(self.day)
         self.terminal = self.day >= len(self.df.index.unique()) - 1
         # print(actions)
-
         if self.terminal:
-            return self.state, self.reward, self.terminal, np.zeros(self.action_space,dtype=float)
+            return self.state, self.reward, self.terminal, np.zeros(self.action_space, dtype=float)
 
         else:
             last_day_memory = self.data
@@ -56,35 +56,20 @@ class trajectory:
                     + self.data.low.values.tolist()
                     + self.data.close.values.tolist()
                     + sum(
-                        [
-                            self.data[tech].values.tolist()
-                            for tech in self.tech_indicator_list
-                        ],
-                        [],
-                    )
-                )
-            
+                [
+                    self.data[tech].values.tolist()
+                    for tech in self.tech_indicator_list
+                ],
+                [],
+            )
+            )
+
             portion = (self.data.close.values / last_day_memory.close.values)
             bc = []
 
-            if self.dataset=="mdax":
-                if i==4:
-                    for j in portion:
-                        bc.append(3**(j*2))
-                if i==3:
-                    for j in portion:
-                        bc.append(3**j)
-                elif i<3:
-                    for j in portion:
-                        bc.append(2**(j*i+2))
-            else:
-                if i==4:
-                    for j in portion:
-                        bc.append(4**(j*3))
-                elif i<4:
-                    for j in portion:
-                        bc.append(3**(j*(i+1)))
-                    
+            for j in portion:
+                bc.append(np.exp(j * (i + 1)))
+
             weights = self.softmax_normalization(bc)
             weights[np.isnan(weights)] = 1.
 
@@ -100,24 +85,24 @@ class trajectory:
         self.day = 0
         self.data = self.df.loc[self.day, :]
         self.state = (
-                    self.data.open.values.tolist()
-                    + self.data.high.values.tolist()
-                    + self.data.low.values.tolist()
-                    + self.data.close.values.tolist()
-                    + sum(
-                        [
-                            self.data[tech].values.tolist()
-                            for tech in self.tech_indicator_list
-                        ],
-                        [],
-                    )
-                    #+self.data.turbulence.tolist()
+                self.data.open.values.tolist()
+                + self.data.high.values.tolist()
+                + self.data.low.values.tolist()
+                + self.data.close.values.tolist()
+                + sum(
+            [
+                self.data[tech].values.tolist()
+                for tech in self.tech_indicator_list
+            ],
+            [],
+        )
 
-                )
+        )
         self.terminal = False
         return self.state
 
     def softmax_normalization(self, actions):
+        actions = np.clip(actions, 0, 709)
         numerator = np.exp(actions)
         denominator = np.sum(np.exp(actions))
         softmax_output = numerator / denominator
