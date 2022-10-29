@@ -74,7 +74,6 @@ def main(variant):
     with open(dataset_path, 'rb') as f:
         trajectories = pickle.load(f)
 
-
     states, traj_lens, returns = [], [], []
     for path in trajectories:
         states.append(path['observations'])
@@ -85,7 +84,6 @@ def main(variant):
     # used for input normalization
     states = np.concatenate(states, axis=0)
     state_mean, state_std = np.mean(states, axis=0), np.std(states, axis=0) + 1e-6
-
     num_timesteps = sum(traj_lens)
 
     print('=' * 50)
@@ -186,7 +184,9 @@ def main(variant):
         scheduler=scheduler,
         action_dim=act_dim,
         state_dim=state_dim,
-        K=u
+        state_mean=state_mean,
+        state_std=state_std,
+        alpha=variant['alpha']
     )
 
     if log_to_wandb:
@@ -207,10 +207,11 @@ def main(variant):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', type=str, default='s&p')  # dow, hightech, s&p, mdax, hsi, csi
+    parser.add_argument('--dataset', type=str, default='ndx')  # dow, hightech, ndx, mdax, hsi, csi
     parser.add_argument('--env', type=str, default='stock')
     parser.add_argument('--seed', type=int, default=0)
     parser.add_argument('--u', type=int, default=40)
+    parser.add_argument('--alpha', type=int, default=1.1)
     parser.add_argument('--pct_traj', type=float, default=1.)
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--embed_dim', type=int, default=128)
@@ -222,7 +223,7 @@ if __name__ == '__main__':
     parser.add_argument('--weight_decay', '-wd', type=float, default=1e-4)
     parser.add_argument('--warmup_steps', type=int, default=10000)
     parser.add_argument('--max_iters', type=int, default=10)
-    parser.add_argument('--num_steps_per_iter', type=int, default=5000)
+    parser.add_argument('--num_steps_per_iter', type=int, default=4000)
     parser.add_argument('--device', type=str, default='cuda')
     parser.add_argument('--log_to_wandb', '-w', type=bool, default=False)
 

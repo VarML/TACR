@@ -21,15 +21,15 @@ def create_data(variant):
     if variant['dataset']=="dow":
         df = YahooDownloader(start_date = '2009-01-01',
                               end_date = '2020-09-24',
-                             ticker_list = config.Dow_TICKER).fetch_data()
+                             ticker_list = config.DOW_TICKER).fetch_data()
     elif variant['dataset']=="hightech":
         df = YahooDownloader(start_date = '2006-10-20',
                              end_date = '2013-11-21',
                              ticker_list = config.HighTech_TICKER).fetch_data()
-    elif variant['dataset'] == "s&p":
+    elif variant['dataset'] == "ndx":
         df = YahooDownloader(start_date = '2009-01-01',
                             end_date = '2021-12-31',
-                            ticker_list = config.SP_TICKER).fetch_data()
+                            ticker_list = config.NDX_TICKER).fetch_data()
     elif variant['dataset'] == "mdax":
         df = YahooDownloader(start_date = '2009-01-01',
                             end_date = '2021-12-31',
@@ -120,7 +120,6 @@ def create_data(variant):
         rews = np.array(rews)
         term = np.array(term)
         acs = np.array(acs)
-
         traj = {"observations": obs, "rewards": rews, "dones": term, "actions": acs}
         return traj
 
@@ -141,7 +140,7 @@ def create_data(variant):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', type=str, default='s&p') #dow, hightech, s&p, mdax, hsi, csi
+    parser.add_argument('--dataset', type=str, default='ndx') #dow, hightech, ndx, mdax, hsi, csi
 
     args = parser.parse_args()
     create_data(variant=vars(args))

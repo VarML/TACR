@@ -73,12 +73,12 @@ def experiment(variant):
     states = np.concatenate(states, axis=0)
     state_mean, state_std = np.mean(states, axis=0), np.std(states, axis=0) + 1e-6
 
-    K = variant['K']
+    u = variant['u']
 
     model = TransformerActor(
         state_dim=state_dim,
         act_dim=act_dim,
-        max_length=K,
+        max_length=u,
         max_ep_len=max_ep_len,
         hidden_size=variant['embed_dim'],
         n_layer=variant['n_layer'],
@@ -104,10 +104,10 @@ def experiment(variant):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', type=str, default='s&p')  # dow, hightech, s&p, mdax, hsi, csi
+    parser.add_argument('--dataset', type=str, default='ndx')  # dow, hightech, ndx, mdax, hsi, csi
     parser.add_argument('--env', type=str, default='stock')
     parser.add_argument('--seed', type=int, default=0)
-    parser.add_argument('--K', type=int, default=40)
+    parser.add_argument('--u', type=int, default=40)
     parser.add_argument('--pct_traj', type=float, default=1.)
     parser.add_argument('--embed_dim', type=int, default=128)
     parser.add_argument('--n_layer', type=int, default=5)
