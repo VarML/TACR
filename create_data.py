@@ -34,10 +34,6 @@ def create_data(variant):
         df = YahooDownloader(start_date = '2009-01-01',
                             end_date = '2021-12-31',
                             ticker_list = config.MDAX_TICKER).fetch_data()
-    elif variant['dataset'] == "hsi":
-        df = YahooDownloader(start_date = '2009-01-01',
-                            end_date = '2021-12-31',
-                            ticker_list = config.HSI_TICKER).fetch_data()
     elif variant['dataset'] == "csi":
         df = YahooDownloader(start_date = '2009-01-01',
                             end_date = '2021-12-31',
@@ -120,6 +116,7 @@ def create_data(variant):
         rews = np.array(rews)
         term = np.array(term)
         acs = np.array(acs)
+        print(np.sum(rews))
         traj = {"observations": obs, "rewards": rews, "dones": term, "actions": acs}
         return traj
 
@@ -140,7 +137,7 @@ def create_data(variant):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', type=str, default='ndx') #dow, hightech, ndx, mdax, hsi, csi
+    parser.add_argument('--dataset', type=str, default='hightech') #dow, hightech, ndx, mdax, csi (kdd was already given)
 
     args = parser.parse_args()
     create_data(variant=vars(args))

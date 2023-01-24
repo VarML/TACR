@@ -22,31 +22,28 @@ def experiment(variant):
     trade = pd.read_csv("datasets/" + dataset + "_trade.csv", index_col=[0])
     max_ep_len = train.index[-1]
 
-    stock_dimension = len(trade.tic.unique())
-    state_space = 4*stock_dimension + len(config.TECHNICAL_INDICATORS_LIST) * stock_dimension
+    dataset_path = f'{"trajectory/" + variant["dataset"] + "_traj.pkl"}'
+    with open(dataset_path, 'rb') as f:
+        trajectories = pickle.load(f)
+    state_space = trajectories[0]['observations'].shape[1]
+    stock_dimension = len(train.tic.unique())
+
     print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
 
-    if dataset=="dow":
-        env_kwargs = {
-            "initial_amount": 1000000,
-            "state_space": state_space,
-            "stock_dim": stock_dimension,
-            "tech_indicator_list": config.TECHNICAL_INDICATORS_LIST,
-            "action_space": stock_dimension,
-            "mode":"test",
-            "turbulence_threshold":100,
-        }
-    else:
-        env_kwargs = {
-            "initial_amount": 1000000,
-            "state_space": state_space,
-            "stock_dim": stock_dimension,
-            "tech_indicator_list": config.TECHNICAL_INDICATORS_LIST,
-            "action_space": stock_dimension,
-            "mode": "test"
-        }
+    turbulence_threshold = 100 if dataset == "dow" else None
+    env_kwargs = {
+        "dataset": dataset,
+        "initial_amount": 1000000,
+        "transaction_cost": 0.0025,
+        "state_space": state_space,
+        "stock_dim": stock_dimension,
+        "tech_indicator_list": config.TECHNICAL_INDICATORS_LIST,
+        "action_space": stock_dimension,
+        "mode": "test",
+        "turbulence_threshold": turbulence_threshold,
+    }
 
-    env = StockPortfolioEnv(df=trade, dataset=dataset, **env_kwargs)
+    env = StockPortfolioEnv(df=trade, **env_kwargs)
 
     seed = variant['seed']
     env.seed(seed)
@@ -61,10 +58,6 @@ def experiment(variant):
 
     state_dim = env.observation_space.shape[0]
     act_dim = env.action_space.shape[0]
-
-    dataset_path = f'{"trajectory/" + variant["dataset"] + "_traj.pkl"}'
-    with open(dataset_path, 'rb') as f:
-        trajectories = pickle.load(f)
 
     states = []
     for path in trajectories:
@@ -104,10 +97,10 @@ def experiment(variant):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', type=str, default='ndx')  # dow, hightech, ndx, mdax, hsi, csi
+    parser.add_argument('--dataset', type=str, default='csi')  # kdd, hightech, dow,  ndx, mdax, csi
     parser.add_argument('--env', type=str, default='stock')
     parser.add_argument('--seed', type=int, default=0)
-    parser.add_argument('--u', type=int, default=40)
+    parser.add_argument('--u', type=int, default=20)
     parser.add_argument('--pct_traj', type=float, default=1.)
     parser.add_argument('--embed_dim', type=int, default=128)
     parser.add_argument('--n_layer', type=int, default=5)

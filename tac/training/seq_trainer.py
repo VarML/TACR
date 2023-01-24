@@ -10,7 +10,7 @@ class SequenceTrainer(Trainer):
         states, actions, rewards, dones, next_state, next_actions, next_rewards, \
         timesteps, next_timesteps, attention_mask = self.get_batch(self.batch_size)
 
-        # # Algorithm 1, line9 : Predict a action
+        # # Algorithm 1, line8 : Predict a action
         state_preds, action_preds, reward_preds = self.actor.forward(
             states, actions, rewards, timesteps, attention_mask=attention_mask,
         )
@@ -27,7 +27,7 @@ class SequenceTrainer(Trainer):
         next_Q_action_preds = next_action_preds.reshape(-1, self.action_dim)[attention_mask.reshape(-1) > 0]
         dones = dones.reshape(-1, 1)[attention_mask.reshape(-1) > 0]
 
-        # Algorithm 1, line10, line11
+        # Algorithm 1, line9, line10
         # Compute the target Q value
         target_Q = self.critic_target(next_state, next_Q_action_preds)
         target_Q = rewards + (dones * self.discount * target_Q).detach()
@@ -41,7 +41,7 @@ class SequenceTrainer(Trainer):
         critic_loss.backward()
         self.critic_optimizer.step()
 
-        # Algorithm 1, line12, line13 : Set lambda and Compute actor loss
+        # Algorithm 1, line11, line12 : Set lambda and Compute actor loss
         pi = Q_action_preds
         Q = self.critic(states, pi)
         lmbda = self.alpha / Q.abs().mean().detach()
@@ -57,7 +57,7 @@ class SequenceTrainer(Trainer):
         if self.scheduler is not None:
             self.scheduler.step()
 
-        # # Algorithm 1, line16 : Update the frozen target models
+        # # Algorithm 1, line13 : Update the frozen target models
         for param, target_param in zip(self.critic.parameters(), self.critic_target.parameters()):
             target_param.data.copy_(self.tau * param.data + (1 - self.tau) * target_param.data)
 

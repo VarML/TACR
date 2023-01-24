@@ -22,13 +22,20 @@ def main(variant):
     train = pd.read_csv("datasets/"+dataset+"_train.csv", index_col=[0])
     max_ep_len = train.index[-1]
 
+    # Load suboptimal trajectories
+    dataset_path = f'{"trajectory/" + variant["dataset"] + "_traj.pkl"}'
+    with open(dataset_path, 'rb') as f:
+        trajectories = pickle.load(f)
+    state_space=trajectories[0]['observations'].shape[1]
     stock_dimension = len(train.tic.unique())
-    state_space = 4*stock_dimension + len(config.TECHNICAL_INDICATORS_LIST) * stock_dimension
+
     print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
 
     # Set portfolio allocation environment
     env_kwargs = {
+        "dataset": dataset,
         "initial_amount": 1000000,
+        "transaction_cost": 0.0025,
         "state_space": state_space,
         "stock_dim": stock_dimension,
         "tech_indicator_list": config.TECHNICAL_INDICATORS_LIST,
@@ -68,11 +75,6 @@ def main(variant):
         resid_pdrop=variant['dropout'],
         attn_pdrop=variant['dropout'],
     )
-
-    # Load suboptimal trajectories
-    dataset_path = f'{"trajectory/"+variant["dataset"]+"_traj.pkl"}'
-    with open(dataset_path, 'rb') as f:
-        trajectories = pickle.load(f)
 
     states, traj_lens, returns = [], [], []
     for path in trajectories:
@@ -186,7 +188,8 @@ def main(variant):
         state_dim=state_dim,
         state_mean=state_mean,
         state_std=state_std,
-        alpha=variant['alpha']
+        alpha=variant['alpha'],
+        crtic_lr=variant['critic_learning_rate'],
     )
 
     if log_to_wandb:
@@ -207,11 +210,11 @@ def main(variant):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', type=str, default='ndx')  # dow, hightech, ndx, mdax, hsi, csi
+    parser.add_argument('--dataset', type=str, default='kdd')  # kdd, hightech, dow, ndx, mdax, csi
     parser.add_argument('--env', type=str, default='stock')
     parser.add_argument('--seed', type=int, default=0)
-    parser.add_argument('--u', type=int, default=40)
-    parser.add_argument('--alpha', type=int, default=1.1)
+    parser.add_argument('--u', type=int, default=20) # 40 (kdd, hightech, dow), 20 (ndx, mdax, csi)
+    parser.add_argument('--alpha', type=int, default=0.9) # 1.6 (kdd), 2. (hightech), 1.4 (dow), 0.9 (ndx, mdax, csi)
     parser.add_argument('--pct_traj', type=float, default=1.)
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--embed_dim', type=int, default=128)
@@ -220,6 +223,7 @@ if __name__ == '__main__':
     parser.add_argument('--activation_function', type=str, default='relu')
     parser.add_argument('--dropout', type=float, default=0.1)
     parser.add_argument('--learning_rate', '-lr', type=float, default=1e-4)
+    parser.add_argument('--critic_learning_rate', type=float, default=1e-6) # 1e-4 (hightech), 1e-6 (others)
     parser.add_argument('--weight_decay', '-wd', type=float, default=1e-4)
     parser.add_argument('--warmup_steps', type=int, default=10000)
     parser.add_argument('--max_iters', type=int, default=10)

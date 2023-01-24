@@ -55,7 +55,7 @@ class TransformerActor(TrajectoryModel):
             # attention mask for GPT: 1 if can be attended to, 0 if not
             attention_mask = torch.ones((batch_size, seq_length), dtype=torch.long)
 
-        # Algorithm 1, line7 : Embeddings of MDP
+        # Subsection 4.1, (9) : Embeddings of MDP
         # embed each modality with a different head
         state_embeddings = self.embed_state(states)
         action_embeddings = self.embed_action(actions)
@@ -67,7 +67,7 @@ class TransformerActor(TrajectoryModel):
         action_embeddings = action_embeddings + time_embeddings
         returns_embeddings = returns_embeddings + time_embeddings
 
-        # Algorithm 1, line8 : Stack embeddings
+        # Algorithm 1, line7 : Stack MDP elements
         # this makes the sequence look like (r_1, s_1, a_1, r_2, s_2, a_2, ...)
         # which works nice in an autoregressive sense since states predict actions
         stacked_inputs = torch.stack((returns_embeddings, state_embeddings, action_embeddings), dim=1
@@ -92,7 +92,7 @@ class TransformerActor(TrajectoryModel):
         # get predictions
         return_preds = self.predict_return(x[:,2])  # Predict next return given state and action (we don't use this)
         state_preds = self.predict_state(x[:,2])    # Predict next state given state and action (we don't use this)
-        action_preds = self.predict_action(x[:,1])  # Algorithm 1, line9 : Predict next action given state
+        action_preds = self.predict_action(x[:,1])  # Algorithm 1, line8 : Predict next action given state
         return state_preds, action_preds, return_preds
 
     def get_action(self, states, actions, rewards,  timesteps, **kwargs):

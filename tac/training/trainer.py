@@ -26,7 +26,7 @@ class Critic(nn.Module):
     
 class Trainer:
 
-    def __init__(self, model, optimizer, batch_size, get_batch, state_dim, action_dim, state_mean,state_std, alpha, loss_fn=None,scheduler=None, eval_fns=None):
+    def __init__(self, model, optimizer, batch_size, get_batch, state_dim, action_dim, state_mean,state_std, alpha, crtic_lr, loss_fn=None,scheduler=None, eval_fns=None):
 
         self.optimizer = optimizer
         self.batch_size = batch_size
@@ -46,12 +46,12 @@ class Trainer:
         self.actor_target = copy.deepcopy(self.actor)
         self.critic = Critic(state_dim, action_dim).to(device)
         self.critic_target = copy.deepcopy(self.critic)
-        self.critic_optimizer = torch.optim.Adam(self.critic.parameters(), lr=1e-6)
+        self.critic_optimizer = torch.optim.Adam(self.critic.parameters(), lr=crtic_lr)
 
         self.discount = 0.99
         self.tau = 0.005
 
-        # Algorithm 1, line12 : Set hyperparameter alpha 0.3 ~ 3
+        # Algorithm 1, line11 : Set hyperparameter alpha 0.9 ~ 2
         self.alpha = alpha
 
         self.start_time = time.time()
